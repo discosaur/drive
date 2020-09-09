@@ -1,12 +1,14 @@
 import { RestUser, Snowflake, GuildRes, RestGuild, RestGuilds } from "../../../disc/mod.ts";
+import { BaseCache } from "./BaseCache.ts";
 
-export class GuildManager
+export class GuildManager extends BaseCache<GuildRes, GuildRes>
 {
-	private cache: Map<Snowflake, Partial<RestGuild>> = new Map();
 	private rest: RestGuilds;
 
 	public constructor(r: RestGuilds)
 	{
+		super();
+
 		this.rest = r;
 	}
 
@@ -16,11 +18,11 @@ export class GuildManager
 	public PurgeCache = () =>
 		this.cache = new Map();
 
-	public async GetFetch(id: Snowflake): Promise<RestGuild>
+	public GetFetch = async (id: Snowflake): Promise<GuildRes | undefined> =>
 	{
-		const item = this.rest.Get(id);
+		const item = await this.rest.Get(id).Get();
 		this.cache.set(id, item);
-		return item;
+		return item as GuildRes;
 	}
 
 	public async GetCached(id: Snowflake): Promise<Partial<RestGuild> | undefined>
