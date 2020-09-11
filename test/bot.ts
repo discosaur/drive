@@ -1,6 +1,7 @@
+import { TOKEN } from "../env.ts";
 import { Client } from "../src/Client.ts";
 
-const client = new Client("NzA3NjY5NzU5MzczNzM3OTg1.XrMK0g._aBVjNoPrntQucfr_ny5cF45Tpw")
+const client = new Client(TOKEN);
 
 await client.login();
 let a = (await client.guilds.Get("714930431065325609"))!;
