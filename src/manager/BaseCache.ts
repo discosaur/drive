@@ -1,37 +1,35 @@
 import { RestUser, Snowflake, GuildRes, RestGuild, RestGuilds, SomeObject } from "../../../disc/mod.ts";
+import { yellow } from "../../../disc/deps.ts";
 
-export class BaseCache<T extends SomeObject, O extends SomeObject>
+export class BaseCache<T extends {id: string}>
 {
-	protected cache: Map<Snowflake, Partial<T>> = new Map();
+	protected cache: Map<Snowflake, T> = new Map();
+
+	// constructor()
+	// {
+	// }
 
 	public PurgeCache = () =>
 		this.cache = new Map();
 	
 	public UpdateCacheItem(item: Partial<T>, dontPatch?: boolean)
 	{
-		if (item.id == undefined)
+		if (item.id || item.id == null)
 			throw new Error("No id");
 
 		const cItem = this.cache.get(item.id!);
 		
 		if (dontPatch || !cItem)
-			this.cache.set(item.id, item);
+			this.cache.set(item.id, item as T);
 		else
 			this.cache.set(item.id, { ...cItem, ...item });
 	}
 
-	public UpdateCacheOverride = (item: T) =>
-		this.cache.set(item.id, item);
+	// public GetFetch: (id: Snowflake) => Promise<T | undefined>;
 
-	public declare GetFetch: (id: Snowflake) => Promise<O | undefined>;
+	// public GetCached = (id: Snowflake): Partial<T> | undefined =>
+	// 	this.cache.get(id);
 
-	public async GetCached(id: Snowflake): Promise<Partial<T> | undefined>
-	{
-		return this.cache.get(id);
-	}
-
-	public async Get(id: Snowflake): Promise<Partial<T> | undefined>
-	{
-		return this.GetCached(id) ?? this.GetFetch(id);
-	}
+	// public Get = async (id: Snowflake): Promise<Partial<T> | undefined> =>
+	// 	this.GetCached(id) ?? this.GetFetch(id);
 }
