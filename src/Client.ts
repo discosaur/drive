@@ -1,23 +1,20 @@
-import { RestClient, SocketClient, GenericFunction, WrappedFunction, SocketEvent } from "../deps.ts";
-import { RestGuild, RestMeUser, RestChannel, RestGuilds, GuildRes } from "../../disc/mod.ts";
+import { RestClient, SocketClient } from "../deps.ts";
+import { RestClientUser, RestChannel, RestGuilds } from "../../disc/mod.ts";
 import { GuildManager } from "./manager/GuildManager.ts";
 
 class BaseClient
 {
 	public rest: RestClient;
 	public ws?: SocketClient;
-	private token: string;
 
 	public constructor(token: string)
 	{
-		this.token = token;
 		this.rest = new RestClient(token);
 	}
 
 	public async login()
 	{
-		const gateway = await this.rest.get("gateway/bot");
-		this.ws = new SocketClient(this.token, (gateway as any).url + "?v=6&encoding=json");
+		this.ws = new SocketClient(this.rest);
 	}
 }
 
@@ -28,13 +25,9 @@ export class Client extends BaseClient
 		super(token);
 	}
 
+	public me = new RestClientUser(this.rest);
+	
 	public guilds = new GuildManager(new RestGuilds(this.rest));
-
-	public me = new RestMeUser(this.rest);
-
-	public getGuildById = async (id: string) =>
-		this.guilds.Get(id);
-		// new RestGuild(this.rest, id) as Guild;
 
 	// public getUserById = (id: string) =>
 	// 	new UserManager(this.rest, id);
@@ -42,7 +35,7 @@ export class Client extends BaseClient
 	public getChannelById = (id: string) =>
 		new RestChannel(this.rest, id);
 
-	public sl()
+	public registerEvents()
 	{
 		this.ws?.on("GUILD_UPDATE", (g: any) => {
 			this.guilds.UpdateCacheItem(g);

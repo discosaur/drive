@@ -28,8 +28,6 @@ export class GuildManager extends BaseCache<Guild>
 	public Get = async (id: Snowflake): Promise<Guild | undefined> =>
 		this.GetCached(id) ?? this.GetFetch(id);
 
-	public Create(v: Partial<Guild>)
-	{
+	public Create = (v: Partial<Guild>): Promise<unknown> =>
 		this.rest.Create(v);
-	}
 }

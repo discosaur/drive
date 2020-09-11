@@ -14,7 +14,7 @@ export class GuildMemberManager extends BaseCache<GuildMember>
 
 	public async GetFetch(id: Snowflake): Promise<GuildMember | undefined>
 	{
-		const ms = new GuildMember(await this.rest.getMember(id));
+		const ms = new GuildMember(this.rest, await this.rest.getMember(id));
 		this.cache.set(ms.id, ms);
 		return ms;
 	}
@@ -30,7 +30,7 @@ export class GuildMemberManager extends BaseCache<GuildMember>
 		let gms: GuildMember[] = [];
 
 		(await this.rest.getMembers("max"))
-			.forEach(i => gms.push(new GuildMember(i)));
+			.forEach(i => gms.push(new GuildMember(this.rest, i)));
 
 		return gms;
 	}

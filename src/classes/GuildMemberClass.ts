@@ -1,13 +1,15 @@
-import { Snowflake } from "../../../disc/mod.ts";
-import { IGuildMember } from "../../deps.ts";
+import { RestGuild, Snowflake, IGuildMember } from "../../deps.ts";
 
 export class GuildMember
 {
 	private item: IGuildMember;
+	private rest?: RestGuild;
 
-	constructor(item: IGuildMember)
+	constructor(rest: RestGuild, item: IGuildMember)
 	{
+		this.rest = rest;
 		this.item = item;
+
 		this.id = this.item.user.id;
 		this.username = this.item.user.username;
 		this.avatar = this.item.user.avatar;
@@ -19,10 +21,13 @@ export class GuildMember
 	public readonly avatar: string;
 	public readonly discriminator: string;
 
-	private ApplyChanges()
-	{
-		console.log("Not implemented");
-	}
+	// private ApplyChanges()
+	// {
+	// 	if (!this.rest)
+	// 		console.log("Not implemented");
+	// 	else
+	// 		this.rest.modifyMember(this.item.user.id, {...this.item, user: undefined, premium_since: undefined, joined_at: undefined})
+	// }
 
 	//#region roles
 	public get roles(): Snowflake[]
@@ -33,7 +38,7 @@ export class GuildMember
 	public set roles(v: Snowflake[])
 	{
 		this.item.roles = v;
-		this.ApplyChanges();
+		this.rest?.modifyMember(this.item.user.id, { roles: v });
 	}
 
 	public assignRole(v: Snowflake)
@@ -41,14 +46,14 @@ export class GuildMember
 		if (!this.item.roles.includes("v"))
 		{
 			this.item.roles.push(v);
-			this.ApplyChanges();
+			this.rest?.modifyMember(this.item.user.id, { roles: this.item.roles });
 		}
 	}
 	
 	public unassignRole(v: Snowflake)
 	{
 		this.item.roles = this.item.roles.filter(i => i != v)
-		this.ApplyChanges();
+		this.rest?.modifyMember(this.item.user.id, { roles: this.item.roles });
 	}
 	//#endregion
 
@@ -61,7 +66,7 @@ export class GuildMember
 	public set nick(v: string | null)
 	{
 		this.item.nick = v;
-		this.ApplyChanges();
+		this.rest?.modifyMember(this.item.user.id, { nick: this.item.nick });
 	}
 	//#endregion
 
@@ -88,7 +93,7 @@ export class GuildMember
 	public set mute(v: boolean)
 	{
 		this.item.mute = v;
-		this.ApplyChanges();
+		this.rest?.modifyMember(this.item.user.id, { mute: v });
 	}
 	//#endregion
 	
@@ -101,7 +106,7 @@ export class GuildMember
 	public set deaf(v: boolean)
 	{
 		this.item.deaf = v;
-		this.ApplyChanges();
+		this.rest?.modifyMember(this.item.user.id, { deaf: v });
 	}
 	//#endregion
 }

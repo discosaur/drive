@@ -1,4 +1,4 @@
-import { GuildModifyReq, GuildRes, RestGuild, Snowflake } from "../../deps.ts";
+import { CreateEmojiReq, GuildRes, RestGuild, Snowflake } from "../../deps.ts";
 import { GuildMemberManager } from "../manager/GuildMemberManager.ts";
 
 export class Guild implements GuildRes
@@ -13,14 +13,22 @@ export class Guild implements GuildRes
 		this.members = new GuildMemberManager(this.rest)
 	}
 
+	// /**
+	//  * Extend this in case this is only a preview
+	//  */
+	// public Extend()
+	// {
+	// 	this.item = { ...this.item, ...this.rest.Get() };
+	// }
+	
+	// private async ApplyChanges()
+	// {
+	// 	const ans = await this.rest.Modify(this.item as GuildModifyReq);
+	// 	this.item = { ...this.item, ...ans };
+	// }
+	
 	public members: GuildMemberManager;
-	
-	private async ApplyChanges()
-	{
-		const ans = await this.rest.Modify(this.item as GuildModifyReq);
-		this.item = { ...this.item, ...ans };
-	}
-	
+
 	public get id(): Readonly<Snowflake>
 	{
 		return this.item.id;
@@ -35,7 +43,7 @@ export class Guild implements GuildRes
 	public set name(v: string)
 	{
 		this.item.name = v;
-		this.ApplyChanges();
+		this.rest.Modify({name: v})
 	}
 	//#endregion
 
@@ -48,7 +56,8 @@ export class Guild implements GuildRes
 	public set icon(v: string | undefined)
 	{
 		this.item.icon = v;
-		this.ApplyChanges();
+		console.warn("not implemented the right way");
+		this.rest.Modify({icon: v})
 	}
 	//#endregion
 
@@ -74,7 +83,7 @@ export class Guild implements GuildRes
 	public set splash(v: unknown)
 	{
 		this.item.splash = v;
-		this.ApplyChanges();
+		this.rest.Modify({splash: v})
 	}
 	//#endregion
 	
@@ -108,13 +117,13 @@ export class Guild implements GuildRes
 	public get emojis(): any[]
 	{
 		// TODO
-		return this.item.features;
+		return this.item.emojis;
 	}
 
-	public set emojis(v: any[])
+	public async CreateEmoji(v: CreateEmojiReq)
 	{
-		this.item.features = v;
-		this.ApplyChanges();
+		const ans = await this.rest.createEmoji(v);/
+		this.item.emojis.push(ans);
 	}
 	//#endregion
 	
@@ -127,7 +136,8 @@ export class Guild implements GuildRes
 	public set banner(v: string | null)
 	{
 		this.item.banner = v;
-		this.ApplyChanges();
+		console.warn("not implemented the right way");
+		this.rest.Modify({banner: v})
 	}
 	//#endregion
 	
@@ -140,7 +150,7 @@ export class Guild implements GuildRes
 	public set owner_id(v: string)
 	{
 		this.item.owner_id = v;
-		this.ApplyChanges();
+		this.rest.Modify({owner_id: v})
 	}
 	//#endregion
 	
@@ -166,20 +176,20 @@ export class Guild implements GuildRes
 	public set region(v: string)
 	{
 		this.item.region = v;
-		this.ApplyChanges();
+		this.rest.Modify({region: v})
 	}
 	//#endregion
 	
 	//#region afk_channel_id
-	public get afk_channel_id(): string | null
+	public get afk_channel_id(): Snowflake | null
 	{
 		return this.item.afk_channel_id;
 	}
 
-	public set afk_channel_id(v: string | null)
+	public set afk_channel_id(v: Snowflake | null)
 	{
 		this.item.afk_channel_id = v;
-		this.ApplyChanges();
+		this.rest.Modify({banner: v});
 	}
 	//#endregion
 
@@ -192,20 +202,20 @@ export class Guild implements GuildRes
 	public set afk_timeout(v: number)
 	{
 		this.item.afk_timeout = v;
-		this.ApplyChanges();
+		this.rest.Modify({afk_timeout: v});
 	}
 	//#endregion
 
 	//#region system_channel_id
-	public get system_channel_id(): string
+	public get system_channel_id(): Snowflake
 	{
 		return this.item.system_channel_id;
 	}
 
-	public set system_channel_id(v: string)
+	public set system_channel_id(v: Snowflake)
 	{
 		this.item.system_channel_id = v;
-		this.ApplyChanges();
+		this.rest.Modify({system_channel_id: v});
 	}
 	//#endregion
 	
@@ -228,11 +238,11 @@ export class Guild implements GuildRes
 		return this.item.widget_channel_id;
 	}
 
-	public set widget_channel_id(v: string)
-	{
-		this.item.widget_channel_id = v;
-		this.ApplyChanges();
-	}
+	// public set widget_channel_id(v: string)
+	// {
+	// 	this.item.widget_channel_id = v;
+	// 	this.rest.Modify({: v});
+	// }
 	//#endregion
 	
 	//#region verification_level
@@ -244,21 +254,23 @@ export class Guild implements GuildRes
 	public set verification_level(v: number)
 	{
 		this.item.verification_level = v;
-		this.ApplyChanges();
+		this.rest.Modify({verification_level: v});
 	}
 	//#endregion
 	
 	//#region roles
 	public get roles(): any[]
 	{
-		//TODO
+		// TODO
 		return this.item.roles;
 	}
 
 	public set roles(v: any[])
 	{
+		// TODO
+		throw new Error("not implemented");
 		this.item.roles = v;
-		this.ApplyChanges();
+		// this.ApplyChanges();
 	}
 	//#endregion
 	
@@ -271,7 +283,7 @@ export class Guild implements GuildRes
 	public set default_message_notifications(v: number)
 	{
 		this.item.default_message_notifications = v;
-		this.ApplyChanges();
+		this.rest.Modify({default_message_notifications: v});
 	}
 	//#endregion
 	
@@ -297,7 +309,7 @@ export class Guild implements GuildRes
 	public set explicit_content_filter(v: number)
 	{
 		this.item.explicit_content_filter = v;
-		this.ApplyChanges();
+		this.rest.Modify({explicit_content_filter: v});
 	}
 	//#endregion
 	
@@ -401,7 +413,7 @@ export class Guild implements GuildRes
 	public set preferred_locale(v: string)
 	{
 		this.item.preferred_locale = v;
-		this.ApplyChanges();
+		this.rest.Modify({preferred_locale: v});
 	}
 	//#endregion
 	
@@ -414,7 +426,7 @@ export class Guild implements GuildRes
 	public set rules_channel_id(v: string)
 	{
 		this.item.rules_channel_id = v;
-		this.ApplyChanges();
+		this.rest.Modify({rules_channel_id: v});
 	}
 	//#endregion
 	
@@ -427,7 +439,7 @@ export class Guild implements GuildRes
 	public set public_updates_channel_id(v: string)
 	{
 		this.item.public_updates_channel_id = v;
-		this.ApplyChanges();
+		this.rest.Modify({public_updates_channel_id: v});
 	}
 	//#endregion
 	
