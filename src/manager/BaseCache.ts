@@ -12,6 +12,9 @@ export class BaseCache<T extends {id: string}>
 	public PurgeCache = () =>
 		this.cache = new Map();
 	
+	public RemoveFromCache = (id: Snowflake): boolean =>
+		this.cache.delete(id);
+
 	public UpdateCacheItem(item: Partial<T>, dontPatch?: boolean)
 	{
 		if (item.id || item.id == null)
