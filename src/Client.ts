@@ -1,6 +1,7 @@
 import { RestClient, SocketClient } from "../deps.ts";
 import { RestClientUser, RestChannel, RestGuilds } from "../../disc/mod.ts";
 import { GuildManager } from "./manager/GuildManager.ts";
+import { Guild } from "./classes/GuildClass.ts";
 
 class BaseClient
 {
@@ -37,7 +38,7 @@ export class Client extends BaseClient
 
 	public registerEvents()
 	{
-		this.ws?.on("GUILD_UPDATE", (g: any) => {
+		this.ws?.on("GUILD_UPDATE", (g: Partial<Guild>) => {
 			this.guilds.UpdateCacheItem(g);
 			// (this as any).guilds.UpdateCacheItem(g);
 		});

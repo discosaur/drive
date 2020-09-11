@@ -1,4 +1,4 @@
-import { CreateEmojiReq, GuildRes, RestGuild, Snowflake } from "../../deps.ts";
+import { CreateEmojiReq, GuildRes, IEmoji, RestGuild, Snowflake } from "../../deps.ts";
 import { GuildMemberManager } from "../manager/GuildMemberManager.ts";
 
 export class Guild implements GuildRes
@@ -114,7 +114,7 @@ export class Guild implements GuildRes
 	//#endregion
 
 	//#region emojis
-	public get emojis(): any[]
+	public get emojis(): IEmoji[]
 	{
 		// TODO
 		return this.item.emojis;
@@ -122,7 +122,7 @@ export class Guild implements GuildRes
 
 	public async CreateEmoji(v: CreateEmojiReq)
 	{
-		const ans = await this.rest.createEmoji(v);/
+		const ans = await this.rest.createEmoji(v);
 		this.item.emojis.push(ans);
 	}
 	//#endregion
