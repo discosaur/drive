@@ -1,13 +1,8 @@
-import { RestUser, Snowflake, GuildRes, RestGuild, RestGuilds, SomeObject } from "../../../disc/mod.ts";
-import { yellow } from "../../../disc/deps.ts";
+import { Snowflake } from "../../disc/mod.ts";
 
 export class BaseCache<T extends {id: string}>
 {
 	protected cache: Map<Snowflake, T> = new Map();
-
-	// constructor()
-	// {
-	// }
 
 	public PurgeCache = () =>
 		this.cache = new Map();

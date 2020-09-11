@@ -1,7 +1,6 @@
 import { RestClient, SocketClient, GenericFunction, WrappedFunction, SocketEvent } from "../deps.ts";
 import { RestGuild, RestMeUser, RestChannel, RestGuilds, GuildRes } from "../../disc/mod.ts";
-// import { UserManager } from "./manager/";
-import { GuildManager, Guild } from "./manager/GuildManager.ts";
+import { GuildManager } from "./manager/GuildManager.ts";
 
 class BaseClient
 {
@@ -27,11 +26,6 @@ export class Client extends BaseClient
 	public constructor(token: string)
 	{
 		super(token);
-
-		this.ws?.on("GUILD_UPDATE", (g: GuildRes) => {
-			this.guilds.UpdateCacheItem(g);
-			console.log(g.name);
-		});
 	}
 
 	public guilds = new GuildManager(new RestGuilds(this.rest));
@@ -50,9 +44,9 @@ export class Client extends BaseClient
 
 	public sl()
 	{
-		this.ws?.on("CHANNEL_DELETE", (a: string) => {
-			this.guilds.RemoveFromCache(a)
+		this.ws?.on("GUILD_UPDATE", (g: any) => {
+			this.guilds.UpdateCacheItem(g);
+			// (this as any).guilds.UpdateCacheItem(g);
 		});
-
 	}
 }
