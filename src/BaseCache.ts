@@ -12,7 +12,7 @@ export class BaseCache<T extends {id: string}>
 
 	public UpdateCacheItem(item: Partial<T>, dontPatch?: boolean)
 	{
-		if (item.id || item.id == null)
+		if (!item.id || item.id == null)
 			throw new Error("No id");
 
 		const cItem = this.cache.get(item.id!);

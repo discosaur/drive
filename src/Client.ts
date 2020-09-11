@@ -1,5 +1,5 @@
 import { RestClient, SocketClient } from "../deps.ts";
-import { RestClientUser, RestChannel, RestGuilds } from "../../disc/mod.ts";
+import { RestClientUser, RestChannel, RestGuilds, Snowflake } from "../../disc/mod.ts";
 import { GuildManager } from "./manager/GuildManager.ts";
 import { Guild } from "./classes/GuildClass.ts";
 
@@ -36,11 +36,21 @@ export class Client extends BaseClient
 	public getChannelById = (id: string) =>
 		new RestChannel(this.rest, id);
 
+	public async login()
+	{
+		this.ws = new SocketClient(this.rest);
+		this.registerEvents();
+	}
+
 	public registerEvents()
 	{
-		this.ws?.on("GUILD_UPDATE", (g: Partial<Guild>) => {
-			this.guilds.UpdateCacheItem(g);
-			// (this as any).guilds.UpdateCacheItem(g);
-		});
+		this.ws?.on("GUILD_UPDATE", (g: Partial<Guild>) =>
+			this.guilds.UpdateCacheItem(g));
+			
+		this.ws?.on("GUILD_CREATE", (g: Partial<Guild>) =>
+			this.guilds.UpdateCacheItem(g, true));
+
+		this.ws?.on("GUILD_DELETE", (g: {id: Snowflake}) =>
+			this.guilds.RemoveFromCache(g.id));
 	}
 }
