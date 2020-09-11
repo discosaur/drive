@@ -1,45 +1,56 @@
-import { RestClient, TypedEmitter, SomeObject, SocketClient, Guilds, MeUser, User, Guild } from "../deps.ts";
+import { RestClient, SocketClient } from "../deps.ts";
+import { RestClientUser, RestChannel, RestGuilds, Snowflake } from "../../disc/mod.ts";
+import { GuildManager } from "./manager/GuildManager.ts";
+import { Guild } from "./classes/GuildClass.ts";
 
-class BaseClient extends TypedEmitter<___, SomeObject>
+class BaseClient
 {
 	public rest: RestClient;
 	public ws?: SocketClient;
-	private token: string;
 
-	constructor(token: string)
+	public constructor(token: string)
 	{
-		super();
-		this.token = token;
 		this.rest = new RestClient(token);
 	}
 
 	public async login()
 	{
-		const url = await this.rest.get("gateway/bot");
-		this.ws = new SocketClient(this.token, url);
-		this.ws.on("READY", () => this.emit("ready"));
+		this.ws = new SocketClient(this.rest);
 	}
 }
 
-class Client extends BaseClient
-{	
-	constructor(token: string)
+export class Client extends BaseClient
+{
+	public constructor(token: string)
 	{
 		super(token);
 	}
 
-	public guilds = new Guilds(this.rest);
+	public me = new RestClientUser(this.rest);
+	
+	public guilds = new GuildManager(new RestGuilds(this.rest));
 
-	public me = new MeUser(this.rest);
-
-	public getGuildById = (id: string) =>
-		new Guild(this.rest, id);
-
-	public getUserById = (id: string) =>
-		new User(this.rest, id);
+	// public getUserById = (id: string) =>
+	// 	new UserManager(this.rest, id);
 
 	public getChannelById = (id: string) =>
 		new RestChannel(this.rest, id);
-}
 
-export { Client };
+	public async login()
+	{
+		this.ws = new SocketClient(this.rest);
+		this.registerEvents();
+	}
+
+	public registerEvents()
+	{
+		this.ws?.on("GUILD_UPDATE", (g: Partial<Guild>) =>
+			this.guilds.UpdateCacheItem(g));
+			
+		this.ws?.on("GUILD_CREATE", (g: Partial<Guild>) =>
+			this.guilds.UpdateCacheItem(g, true));
+
+		this.ws?.on("GUILD_DELETE", (g: {id: Snowflake}) =>
+			this.guilds.RemoveFromCache(g.id));
+	}
+}

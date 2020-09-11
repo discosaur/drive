@@ -1,7 +1,5 @@
-# disc (WIP)
-> **Low level Discord API wrapper**
+# drive (WIP)
+> **Mid level Discord API wrapper based on [disc](https://github.com/discosaur/disc)**
 
-## includes:
-- Discord WebSocket Client
-- Discord Rest API Client
-- Typings for both
+<!-- ## includes:
+-  -->
