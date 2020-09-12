@@ -1,0 +1,5 @@
+{
+	"imports": {
+		"disc": "../disc/mod.ts"
+	}
+}
